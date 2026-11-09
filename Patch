@@ -1,0 +1,33 @@
+name: Patch Recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      recovery_url:
+        description: 'Link direto do seu recovery.img'
+        required: true
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar Ferramenta
+        run: |
+          git clone https://github.com/ravindu644/patch-recovery-revived tool
+          cd tool
+          
+      - name: Baixar sua Imagem
+        run: |
+          wget -O tool/recovery.img "${{ github.event.inputs.recovery_url }}"
+          
+      - name: Aplicar Patch
+        run: |
+          cd tool
+          chmod +x patch-recovery.sh
+          ./patch-recovery.sh recovery.img
+          
+      - name: Enviar Arquivo Pronto
+        uses: actions/upload-artifact@v4
+        with:
+          name: recovery-patched-odin
+          path: tool/patched-recovery.tar
